@@ -1,0 +1,1366 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#10293D; --navy-2:#173347; --yellow:#FFC800; --mint:#7FE0C4; --mint-dark:#3FB894;
+    --bg:#F3F6F7; --card:#FFFFFF; --text:#10293D; --muted:#64798c; --danger:#D9534F; --good:#2FAE85; --border:#E1E8EC;
+  }
+  *{box-sizing:border-box;}
+  body,html{margin:0;padding:0;}
+  #root{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-bottom:60px;}
+  h1,h2,h3{font-family:'Archivo Black','Inter',sans-serif;font-weight:400;letter-spacing:-0.01em;}
+  .topbar{background:var(--navy);color:#fff;padding:18px 24px;border-radius:0 0 18px 18px;position:relative;overflow:hidden;}
+  .topbar::after{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:var(--yellow);border-radius:40px;opacity:0.9;transform:rotate(15deg);z-index:0;}
+  .topbar::before{content:"";position:absolute;top:-30px;right:20px;width:60px;height:180px;background:var(--mint);opacity:0.85;border-radius:20px;transform:rotate(15deg);z-index:0;}
+  .topbar-inner{position:relative;z-index:1;}
+  .topbar h1{font-size:21px;margin:0 0 4px 0;}
+  .topbar .sub{font-size:13px;color:var(--mint);font-weight:600;}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+  select, input[type=month]{font-family:'Inter';font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;border:none;background:#fff;color:var(--navy);}
+  button{font-family:'Inter';font-weight:700;font-size:13px;padding:9px 14px;border-radius:8px;border:none;cursor:pointer;transition:transform .1s ease;}
+  button:active{transform:scale(0.97);}
+  .btn-yellow{background:var(--yellow);color:var(--navy);}
+  .btn-mint{background:var(--mint);color:var(--navy);}
+  .btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.5);}
+  button:disabled{opacity:0.4;cursor:not-allowed;}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+  .status-open{background:var(--mint);color:var(--navy);}
+  .status-closed{background:var(--yellow);color:var(--navy);}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:16px 24px 0 24px;scrollbar-width:thin;}
+  .tab{flex:0 0 auto;padding:9px 14px;border-radius:10px 10px 0 0;font-size:12.5px;font-weight:700;color:var(--muted);background:#e7edf0;cursor:pointer;white-space:nowrap;border:1px solid var(--border);border-bottom:none;}
+  .tab.active{background:var(--card);color:var(--navy);}
+  .home-panel{background:linear-gradient(135deg,#f8fbfc 0%,#edf4f5 100%);}
+  .home-hero{background:var(--navy);color:#fff;border-radius:14px;padding:28px 30px;margin-bottom:20px;position:relative;overflow:hidden;}
+  .home-hero:after{content:'';position:absolute;width:180px;height:180px;border-radius:42px;background:var(--yellow);right:-55px;top:-78px;transform:rotate(18deg);opacity:.95;}
+  .home-hero h2{position:relative;z-index:1;margin:0 0 7px;font-size:25px;}
+  .home-hero p{position:relative;z-index:1;margin:0;color:var(--mint);font-size:13px;font-weight:600;}
+  .home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
+  .home-card{min-height:142px;text-align:left;padding:18px;border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--navy);display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;box-shadow:0 4px 12px rgba(16,41,61,.06);}
+  .home-card:hover{transform:translateY(-3px);border-color:var(--mint-dark);box-shadow:0 8px 18px rgba(16,41,61,.12);}
+  .home-card-number{display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;border-radius:50%;background:var(--yellow);font-size:13px;font-weight:800;}
+  .home-card-title{font-size:15px;font-weight:800;line-height:1.2;}.home-card-desc{font-size:11.5px;color:var(--muted);font-weight:600;}
+  .home-card.history .home-card-number{background:var(--mint);}
+  @media (max-width:600px){.home-hero{padding:22px 20px;}.home-hero h2{font-size:21px;}.home-grid{grid-template-columns:1fr;}.tabs{padding-left:16px;padding-right:16px;}}
+  .panel{background:var(--card);margin:0 24px;border-radius:0 12px 12px 12px;padding:22px 24px 28px 24px;border:1px solid var(--border);min-height:400px;}
+  .section-title{font-size:19px;margin:0 0 4px 0;color:var(--navy);}
+  .subsection-title{font-size:15px;margin:22px 0 6px 0;color:var(--navy);}
+  .section-desc{font-size:13px;color:var(--muted);margin:0 0 16px 0;}
+  .hint{font-size:11.5px;color:var(--muted);background:#f7fafb;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;margin-bottom:14px;}
+  .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;}
+  .card{background:#fbfcfd;border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+  .card h4{margin:0 0 10px 0;font-size:13px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .swatch{width:10px;height:10px;border-radius:3px;background:var(--mint);display:inline-block;}
+  .field-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;}
+  .field-row label{font-size:12px;color:var(--muted);font-weight:600;}
+  .field-row input{width:100px;text-align:right;padding:6px 8px;border-radius:6px;border:1px solid var(--border);font-size:13px;font-weight:700;font-family:'Inter';color:var(--navy);}
+  .field-row input:disabled{background:#f1f4f5;color:var(--muted);}
+  .pct-badge{font-size:12.5px;font-weight:800;padding:3px 9px;border-radius:20px;background:var(--navy);color:#fff;}
+  .pct-badge.low{background:var(--danger);} .pct-badge.mid{background:var(--yellow);color:var(--navy);} .pct-badge.high{background:var(--good);}
+  .table-scroll{width:100%;overflow-x:auto;margin-bottom:18px;border-radius:8px;}
+  .table-scroll table{margin-bottom:0;min-width:680px;}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px;}
+  thead th{background:var(--navy);color:#fff;padding:8px 8px;text-align:center;font-size:11px;white-space:normal;overflow-wrap:anywhere;}
+  thead th:first-child{text-align:left;border-radius:8px 0 0 0;}
+  thead th:last-child{border-radius:0 8px 0 0;}
+  tbody td{padding:6px 6px;border-bottom:1px solid var(--border);text-align:center;white-space:normal;overflow-wrap:anywhere;}
+  tbody td:first-child{text-align:left;font-weight:600;color:var(--navy);}
+  tbody tr:hover{background:#f7fafb;}
+  tbody input, tbody select, tbody textarea{width:64px;max-width:100%;padding:5px 6px;border-radius:5px;border:1px solid var(--border);text-align:center;font-family:'Inter';font-weight:700;font-size:12px;color:var(--navy);}
+  tbody input:disabled, tbody select:disabled, tbody textarea:disabled{background:#f1f4f5;color:var(--muted);}
+  .percent-input{display:inline-flex;align-items:center;gap:3px;}
+  .percent-input input{width:56px;}
+  .percent-input b{font-size:12px;color:var(--muted);}
+  .verified-value{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  .verification-note{font-size:9px;font-weight:800;color:var(--muted);}
+  .sla-ok-input input{background:var(--yellow);border-color:var(--yellow);border-radius:20px;color:var(--navy);}
+  .totrow td{background:#eef3f5;font-weight:800;}
+  .dyn-table-actions{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  .dyn-table-actions.with-gap{gap:8px;flex-wrap:wrap;align-items:center;}
+  .add-row-btn{background:var(--navy);color:#fff;font-size:12px;padding:6px 12px;}
+  .secondary-row-btn{background:#e7edf0;color:var(--navy);font-size:12px;padding:6px 12px;}
+  .del-btn{background:var(--danger);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;}
+  .delta{font-size:11px;font-weight:700;margin-left:6px;}
+  .delta.up{color:var(--good);} .delta.down{color:var(--danger);} .delta.flat{color:var(--muted);}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  @media (max-width:900px){.two-col{grid-template-columns:1fr;}}
+  .empty-note{font-size:12.5px;color:var(--muted);background:#f7fafb;border:1px dashed var(--border);border-radius:10px;padding:14px;text-align:center;}
+  .closed-banner{background:#fff8e1;border:1px solid var(--yellow);color:#7a5c00;padding:10px 14px;border-radius:8px;font-size:12.5px;font-weight:600;margin-bottom:16px;}
+  .loading{padding:60px;text-align:center;color:var(--muted);font-size:14px;}
+  .grp-tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;background:var(--mint);color:var(--navy);}
+  .cmp-table td{font-size:11px;}
+  .cmp-cell{white-space:nowrap;}
+  .deck-shot{margin:10px 0 18px 0;border:1px solid var(--border);border-radius:8px;background:#f7fafb;overflow:hidden;}
+  .deck-shot img{display:block;width:100%;max-height:520px;object-fit:contain;background:#fff;}
+  .file-input-hidden{display:none;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 18px 0;}
+  .kpi{background:#fbfcfd;border:1px solid var(--border);border-left:5px solid var(--mint);border-radius:8px;padding:12px 14px;min-height:86px;}
+  .kpi .label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0;}
+  .kpi .value{font-size:25px;font-weight:800;color:var(--navy);margin-top:6px;line-height:1.1;}
+  .kpi .note{font-size:11.5px;color:var(--muted);margin-top:5px;}
+  .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:14px 0 22px;}
+  .chart-box{border:1px solid var(--border);border-radius:8px;background:#fbfcfd;padding:12px 14px;min-height:310px;}
+  .chart-box.wide{grid-column:1/-1;}
+  .chart-box h4{margin:0 0 10px 0;font-size:13px;color:var(--navy);}
+  .summary-go-title{font-size:14px;margin:20px 0 8px;color:var(--navy);font-family:'Inter',sans-serif;font-weight:800;border-top:1px solid var(--border);padding-top:14px;}
+  .chart-box canvas{width:100% !important;height:250px !important;}
+  .chart-box.wide canvas{height:300px !important;}
+  .prestaciones-board{grid-column:1/-1;border:1px solid var(--border);border-radius:10px;background:#fbfcfd;overflow:hidden;}
+  .prestaciones-board-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+  .prestaciones-board-head h4{margin:0 0 4px;font-size:13px;color:var(--navy);}
+  .prestaciones-board-head p{margin:0;font-size:11.5px;color:var(--muted);}
+  .prestacion-row{display:grid;grid-template-columns:minmax(205px,1.2fr) minmax(175px,1fr) minmax(175px,1fr) minmax(130px,.7fr);gap:16px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border);}
+  .prestacion-row:last-child{border-bottom:none;}
+  .prestacion-row.header{background:#eef3f5;padding-top:8px;padding-bottom:8px;font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;}
+  .prestacion-name{font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.3;}
+  .metric-label{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:6px;font-size:11px;color:var(--muted);}
+  .metric-label b{font-size:12px;color:var(--navy);}
+  .progress-track{height:9px;border-radius:20px;background:#e4ebee;overflow:hidden;}
+  .progress-fill{display:block;height:100%;border-radius:inherit;min-width:2px;}
+  .progress-fill.coverage{background:var(--mint-dark);}.progress-fill.sla{background:var(--yellow);}
+  .sla-counts{display:flex;flex-wrap:wrap;gap:6px;}
+  .sla-count{font-size:11px;font-weight:800;padding:5px 7px;border-radius:6px;white-space:nowrap;}
+  .sla-count.ok{background:#dff5ed;color:#167a5d;}.sla-count.late{background:#fbe7e6;color:#a33935;}
+  @media (max-width:850px){.table-scroll{box-shadow:inset -10px 0 10px -12px var(--navy);}.prestacion-row{grid-template-columns:1fr;gap:10px;}.prestacion-row.header{display:none;}.prestacion-row{padding:14px;}.sla-counts{margin-top:-2px;}}
+  .public-mode input:disabled,.public-mode textarea:disabled,.public-mode select:disabled{background:transparent;border-color:transparent;color:var(--text);opacity:1;appearance:none;}
+  .public-mode .sla-ok-input input:disabled{background:var(--yellow);border-color:var(--yellow);color:var(--navy);}
+  .public-mode textarea:disabled{resize:none;}
+  .mode-note{font-size:12px;font-weight:700;color:var(--mint);}
+</style>
+
+</head>
+<body>
+<div id="root"><div class="loading">Cargando informe…</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function(){
+
+const PARAMS = new URLSearchParams(window.location.search);
+const IS_LOCAL_FILE = window.location.protocol === 'file:';
+const IS_PUBLIC_FORCED = PARAMS.get('publico') === '1' || PARAMS.get('modo') === 'publico' || PARAMS.get('readonly') === '1';
+const IS_EDITOR = !IS_PUBLIC_FORCED && (IS_LOCAL_FILE || PARAMS.get('editor') === '1' || PARAMS.get('modo') === 'editor' || PARAMS.get('editar') === '1');
+const PUBLIC_DATA_FILE = 'datos.xlsx';
+
+const COMUNAS = Array.from({length:15}, (_,i)=>'Comuna '+(i+1));
+
+const ORDENAMIENTO_PRESTACIONES_DEFAULT = [
+  'Buzon','Cableado','Puestos de Diarios','Puestos de Flores','Estructura publicitaria',
+  'Garitas','Bicicleteros','Areas gastronómicas (decks + mesas y sillas)','Anclajes','Local Comercial'
+];
+const ORDENAMIENTO_PRESTACIONES_RENAMES = {
+  [normKey('Buzón eléctr. en mal estado o abandonado')]: 'Buzon',
+  [normKey('Columna/poste en mal estado o abandonado')]: 'Cableado',
+  [normKey('Anomalías en puesto de diarios')]: 'Puestos de Diarios',
+  [normKey('Anomalías en puesto de flores')]: 'Puestos de Flores',
+  [normKey('Estructura publicit. en espacio público')]: 'Estructura publicitaria',
+  [normKey('Garita seg. abandonada u obstru. vereda')]: 'Garitas',
+  [normKey('Irregularidades con bicicleteros')]: 'Bicicleteros',
+  [normKey('Ocupación indebida gastronómicos')]: 'Areas gastronómicas (decks + mesas y sillas)',
+  [normKey('Ocupación indebida: anclajes en vereda')]: 'Anclajes',
+  [normKey('Ocupación indebida: por locales comerciales')]: 'Local Comercial'
+};
+const VENTA_PRESTACIONES_DEFAULT = ['Venta ambulante / manteros'];
+const ESPACIO_PUBLICO_PRESTACIONES_DEFAULT = [];
+
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// ---------- storage ----------
+async function sGet(key, fallback){
+  try{
+    if(window.storage){ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : fallback; }
+    const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback;
+  }catch(e){ return fallback; }
+}
+async function sSet(key, value){
+  try{
+    if(window.storage) await window.storage.set(key, JSON.stringify(value), false);
+    else localStorage.setItem(key, JSON.stringify(value));
+  }catch(e){ console.error('storage error', e); }
+}
+
+// ---------- defaults ----------
+function normalizePercentage(value){
+  const n = Number(value);
+  if(!Number.isFinite(n)) return 0;
+  // Excel almacena porcentajes como fracciones (por ejemplo, 0.66 para 66%).
+  return Math.round(n>0 && n<1 ? n*100 : n);
+}
+function emptyPrestacion(nombre){ return {nombre, bucket:0, verificado:0, pendiente:0, slaAcordado:0, slaOk:0, fueraSla:0, slaColaborativaPct:0}; }
+function defaultOperativo(){ return {fecha:'', nombre:'', participantes:'', recursos:'', secuestrado:'', cantidadSecuestros:0, comprobacion:''}; }
+function defaultDesalojo(){ return {fecha:'', lugar:'', recursos:''}; }
+function normalizePrestacion(p){
+  p.nombre = ORDENAMIENTO_PRESTACIONES_RENAMES[normKey(p.nombre)] || p.nombre;
+  if(p.slaAcordado===undefined) p.slaAcordado = Number(p.slaAcordadoPct)||0;
+  p.slaAcordado = Number(p.slaAcordado)||0;
+  if(p.slaOk===undefined) p.slaOk = p.slaReclamosPct!==undefined ? Number(p.slaReclamosPct)||0 : 0;
+  if(p.fueraSla===undefined) p.fueraSla = 0;
+  p.slaColaborativaPct = normalizePercentage(p.slaColaborativaPct===undefined ? 0 : p.slaColaborativaPct);
+  return p;
+}
+
+function defaultMonth(id){
+  const [y,m] = id.split('-');
+  return {
+    id, label: MESES[parseInt(m,10)-1] + ' ' + y, closed:false, closedAt:null, createdAt:Date.now(),
+    grandesOperativos:{ operativos: [] },
+    goOrdenamiento:{
+      prestaciones: ORDENAMIENTO_PRESTACIONES_DEFAULT.map(emptyPrestacion),
+      relevamientoAreasGastronomicas: COMUNAS.map(c=>({comuna:c, ingresados:0, verificados:0})),
+      relevamientos: [],
+      deckSSOUR: [],
+      deckImage: ''
+    },
+    goVenta:{
+      prestaciones: VENTA_PRESTACIONES_DEFAULT.map(emptyPrestacion),
+      secuestrosPorComuna: COMUNAS.map(c=>({comuna:c, secuestros:0, decomisos:0}))
+    },
+    goEspacioPublico:{
+      prestaciones: ESPACIO_PUBLICO_PRESTACIONES_DEFAULT.map(emptyPrestacion),
+      operativosPorComuna: COMUNAS.map(c=>({comuna:c, positivos:0, negativos:0, grupo:'Resto de CABA'}))
+    },
+    goLogistica:{
+      cableado: {planificado:0, verificado:0, pendiente:0},
+      desalojos: []
+    },
+    notas:''
+  };
+}
+
+function ensureShape(data, id){
+  const def = defaultMonth(id);
+  if(!data.grandesOperativos) data.grandesOperativos = def.grandesOperativos;
+  if(!data.grandesOperativos.operativos) data.grandesOperativos.operativos = [];
+
+  if(!data.goOrdenamiento) data.goOrdenamiento = def.goOrdenamiento;
+  if(!data.goOrdenamiento.prestaciones || data.goOrdenamiento.prestaciones.length===0) data.goOrdenamiento.prestaciones = def.goOrdenamiento.prestaciones;
+  data.goOrdenamiento.prestaciones.forEach(normalizePrestacion);
+  if(!data.goOrdenamiento.relevamientoAreasGastronomicas || data.goOrdenamiento.relevamientoAreasGastronomicas.length===0) data.goOrdenamiento.relevamientoAreasGastronomicas = def.goOrdenamiento.relevamientoAreasGastronomicas;
+  data.goOrdenamiento.relevamientoAreasGastronomicas.forEach(r=>{ r.ingresados=Number(r.ingresados)||0; r.verificados=Number(r.verificados)||0; });
+  if(!data.goOrdenamiento.relevamientos) data.goOrdenamiento.relevamientos = [];
+  data.goOrdenamiento.relevamientos.forEach(r=>{ r.avancePct=normalizePercentage(r.avancePct); });
+  if(!data.goOrdenamiento.deckSSOUR) data.goOrdenamiento.deckSSOUR = [];
+  if(!data.goOrdenamiento.deckImage) data.goOrdenamiento.deckImage = '';
+
+  if(!data.goVenta) data.goVenta = def.goVenta;
+  if(!data.goVenta.prestaciones || data.goVenta.prestaciones.length===0) data.goVenta.prestaciones = def.goVenta.prestaciones;
+  data.goVenta.prestaciones.forEach(normalizePrestacion);
+  const manteros = 'Venta ambulante / manteros';
+  if(!data.goVenta.prestaciones.some(p=>normKey(p.nombre)===normKey(manteros))) data.goVenta.prestaciones.push(emptyPrestacion(manteros));
+  if(!data.goVenta.secuestrosPorComuna || data.goVenta.secuestrosPorComuna.length===0) data.goVenta.secuestrosPorComuna = def.goVenta.secuestrosPorComuna;
+  data.goVenta.secuestrosPorComuna.forEach(r=>{ r.decomisos = normalizePercentage(r.decomisos); });
+
+  if(!data.goEspacioPublico) data.goEspacioPublico = def.goEspacioPublico;
+  if(!data.goEspacioPublico.prestaciones) data.goEspacioPublico.prestaciones = [];
+  data.goEspacioPublico.prestaciones.forEach(normalizePrestacion);
+  if(!data.goEspacioPublico.operativosPorComuna || data.goEspacioPublico.operativosPorComuna.length===0) data.goEspacioPublico.operativosPorComuna = def.goEspacioPublico.operativosPorComuna;
+
+  if(!data.goLogistica) data.goLogistica = def.goLogistica;
+  if(!data.goLogistica.cableado) data.goLogistica.cableado = {planificado:0, verificado:0, pendiente:0};
+  if(!data.goLogistica.desalojos) data.goLogistica.desalojos = [];
+
+  if(data.notas===undefined) data.notas='';
+  if(data.closed===undefined) data.closed=false;
+  if(!data.label) data.label = def.label;
+  return data;
+}
+
+// ---------- state ----------
+let STATE = { index: [], currentId: null, data: null, prevData: null, allMonths: {}, activeTab: 'inicio' };
+let saveTimer = null;
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(()=>{ sSet('month:'+STATE.data.id, STATE.data); }, 350); }
+
+function pct(n,d){ if(!d) return 0; return Math.round((n/d)*1000)/10; }
+function pctBadgeClass(p){ if(p>=90) return 'high'; if(p>=60) return 'mid'; return 'low'; }
+function fmt(n){ if(n===undefined||n===null||isNaN(n)) return '0'; return Number(n).toLocaleString('es-AR'); }
+function fmtPct(n){ return Math.round(n) + '%'; }
+function normKey(v){ return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'').trim(); }
+function excelDate(value){
+  if(typeof value === 'number' && value > 0 && window.XLSX && XLSX.SSF){
+    const date = XLSX.SSF.parse_date_code(value);
+    if(date) return String(date.d).padStart(2,'0') + '/' + String(date.m).padStart(2,'0') + '/' + date.y;
+  }
+  return String(value===undefined || value===null ? '' : value).trim();
+}
+function browserMonthId(){
+  const requested = PARAMS.get('mes');
+  if(requested && /^\d{4}-\d{2}$/.test(requested)) return requested;
+  const now = new Date();
+  return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+}
+function rowMonth(row, fallback){
+  const raw = String(val(row, ['mes','month','periodo'], fallback||'')).trim();
+  return /^\d{4}-\d{2}$/.test(raw) ? raw : (fallback||browserMonthId());
+}
+
+function val(row, keys, fallback=''){
+  for(const k of keys){ if(row[k]!==undefined && row[k]!==null && row[k]!=='') return row[k]; }
+  return fallback;
+}
+function numVal(row, keys){ const n = parseFloat(String(val(row, keys, 0)).replace(',','.')); return isNaN(n) ? 0 : n; }
+function sheetRows(wb, sheetName){
+  const ws = wb.Sheets[sheetName];
+  const raw = XLSX.utils.sheet_to_json(ws, {defval:''});
+  return raw.map(r=>{
+    const out = {};
+    Object.keys(r).forEach(k=> out[normKey(k)] = r[k]);
+    return out;
+  });
+}
+function rowsToPrestaciones(rows){
+  return rows.map(r=>normalizePrestacion({
+    nombre: String(val(r, ['prestacion','nombre','concepto'], '')).trim(),
+    bucket: numVal(r, ['ingresado','bucket','planificado','total']),
+    verificado: numVal(r, ['verificado','verificados','verificadoresuelto']),
+    slaAcordado: numVal(r, ['slaacordado','slaacordadopct']),
+    slaOk: numVal(r, ['slaok','ok','slareclamosok']),
+    fueraSla: numVal(r, ['fueradesla','fuerasla','slafuera','slareclamosfuera']),
+    slaColaborativaPct: normalizePercentage(numVal(r, ['slabacolaborativa','slacolaborativa','slabacolaborativapct','slacolaborativapct']))
+  })).filter(r=>r.nombre);
+}
+function importPrestacionesIfAny(wb, matcher, target){
+  const name = wb.SheetNames.find(s=>matcher(normKey(s)));
+  if(!name) return false;
+  const rows = rowsToPrestaciones(sheetRows(wb, name));
+  if(rows.length) target.splice(0, target.length, ...rows);
+  return rows.length>0;
+}
+function applyWorkbookToData(wb, d, monthId){
+  const targetMonth = monthId || browserMonthId();
+  const onlyMonth = rows => rows.filter(r=>rowMonth(r, targetMonth)===targetMonth);
+  let changed = false;
+
+  function importPrestacionesMonth(matcher, target){
+    const name = wb.SheetNames.find(s=>matcher(normKey(s)));
+    if(!name) return false;
+    const rows = rowsToPrestaciones(onlyMonth(sheetRows(wb, name)));
+    if(rows.length){ target.splice(0, target.length, ...rows); return true; }
+    return false;
+  }
+
+  changed = importPrestacionesMonth(s=>s.includes('ordenamiento'), d.goOrdenamiento.prestaciones) || changed;
+  changed = importPrestacionesMonth(s=>s.includes('venta'), d.goVenta.prestaciones) || changed;
+  changed = importPrestacionesMonth(s=>(s.includes('espacio') || s.includes('intervencion')) && !s.includes('comuna'), d.goEspacioPublico.prestaciones) || changed;
+
+  const relName = wb.SheetNames.find(s=>normKey(s).includes('relevamiento') && !normKey(s).includes('gastronomica'));
+  if(relName){
+    const rows = onlyMonth(sheetRows(wb, relName)).map(r=>({nombre:String(val(r,['relevamiento','nombre'], '')).trim(), avancePct:normalizePercentage(numVal(r,['avance','avancepct','porcentaje']))})).filter(r=>r.nombre);
+    if(rows.length){ d.goOrdenamiento.relevamientos = rows; changed = true; }
+  }
+  const gastroName = wb.SheetNames.find(s=>normKey(s).includes('gastronomica'));
+  if(gastroName){
+    const rows = onlyMonth(sheetRows(wb, gastroName)).map(r=>({comuna:String(val(r,['comuna'], '')).trim(), ingresados:numVal(r,['ingresados','ingresado','bucket','planificado','total']), verificados:numVal(r,['verificados','verificado','verificadoresuelto'])})).filter(r=>r.comuna);
+    if(rows.length){ d.goOrdenamiento.relevamientoAreasGastronomicas = rows; changed = true; }
+  }
+  const deckName = wb.SheetNames.find(s=>normKey(s).includes('deck') || normKey(s).includes('powerbi'));
+  if(deckName){
+    const rows = onlyMonth(sheetRows(wb, deckName)).map(r=>({indicador:String(val(r,['indicador','nombre'], '')).trim(), valor:String(val(r,['valor','numero','cantidad'], '')).trim()})).filter(r=>r.indicador);
+    if(rows.length){ d.goOrdenamiento.deckSSOUR = rows; changed = true; }
+  }
+  const secName = wb.SheetNames.find(s=>normKey(s).includes('secuestro') || normKey(s).includes('decomiso'));
+  if(secName){
+    const rows = onlyMonth(sheetRows(wb, secName)).map(r=>({comuna:String(val(r,['comuna'], '')).trim(), secuestros:numVal(r,['secuestros']), decomisos:normalizePercentage(numVal(r,['decomisos']))})).filter(r=>r.comuna);
+    if(rows.length){ d.goVenta.secuestrosPorComuna = rows; changed = true; }
+  }
+  const opComName = wb.SheetNames.find(s=>normKey(s).includes('operativoscomuna') || normKey(s).includes('positivos') || (normKey(s).includes('espacio') && normKey(s).includes('comuna')));
+  if(opComName){
+    const rows = onlyMonth(sheetRows(wb, opComName)).map(r=>({comuna:String(val(r,['comuna'], '')).trim(), positivos:numVal(r,['positivos']), negativos:numVal(r,['negativos']), grupo:String(val(r,['grupo'], 'Resto de CABA')).trim()})).filter(r=>r.comuna);
+    if(rows.length){ d.goEspacioPublico.operativosPorComuna = rows; changed = true; }
+  }
+  const grandesName = wb.SheetNames.find(s=>normKey(s).includes('grandesoperativos') || normKey(s)==='operativos');
+  if(grandesName){
+    const rows = onlyMonth(sheetRows(wb, grandesName)).map(r=>({fecha:excelDate(val(r,['fecha'], '')), nombre:String(val(r,['operativo','nombre','lugar'], '')).trim(), participantes:String(val(r,['participantes'], '')).trim(), secuestrado:String(val(r,['secuestrado','quesesecuestro'], '')).trim(), cantidadSecuestros:numVal(r,['cantidadsecuestros','cantidad'])})).filter(r=>r.fecha||r.nombre);
+    if(rows.length){ d.grandesOperativos.operativos = rows; changed = true; }
+  }
+  const desalojosName = wb.SheetNames.find(s=>normKey(s).includes('desalojo'));
+  if(desalojosName){
+    const rows = onlyMonth(sheetRows(wb, desalojosName)).map(r=>({fecha:excelDate(val(r,['fecha'], '')), lugar:String(val(r,['lugar','direccion','ubicacion'], '')).trim(), recursos:String(val(r,['recursos','cantidad'], '')).trim()})).filter(r=>r.fecha||r.lugar||r.recursos);
+    if(rows.length){ d.goLogistica.desalojos = rows; changed = true; }
+  }
+  const cableadoName = wb.SheetNames.find(s=>normKey(s).includes('cableado'));
+  if(cableadoName){
+    const row = onlyMonth(sheetRows(wb, cableadoName))[0];
+    if(row){
+      d.goLogistica.cableado.planificado = numVal(row, ['planificado','ingresado','total']);
+      d.goLogistica.cableado.verificado = numVal(row, ['verificado','verificadoresuelto','realizado']);
+      d.goLogistica.cableado.pendiente = 0;
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function workbookMonthIds(wb){
+  const ids = new Set();
+  wb.SheetNames.forEach(name=>{
+    sheetRows(wb, name).forEach(r=>{
+      const m = String(val(r, ['mes','month','periodo'], '')).trim();
+      if(/^\d{4}-\d{2}$/.test(m)) ids.add(m);
+    });
+  });
+  if(ids.size===0) ids.add(browserMonthId());
+  return [...ids].sort();
+}
+
+function loadWorkbookIntoState(wb){
+  const ids = workbookMonthIds(wb);
+  const months = {};
+  let changedAny = false;
+  ids.forEach(id=>{
+    const data = ensureShape(defaultMonth(id), id);
+    const changed = applyWorkbookToData(wb, data, id);
+    data.closed = !IS_EDITOR;
+    months[id] = data;
+    changedAny = changedAny || changed;
+  });
+  if(!changedAny) return false;
+  STATE.index = ids;
+  STATE.allMonths = months;
+  const requested = PARAMS.get('mes');
+  const selected = requested && months[requested] ? requested : ids[ids.length-1];
+  STATE.currentId = selected;
+  STATE.data = months[selected];
+  const pos = ids.indexOf(selected);
+  STATE.prevData = pos>0 ? months[ids[pos-1]] : null;
+  return true;
+}
+
+async function persistStateMonths(){
+  await sSet('months-index', STATE.index);
+  for(const id of STATE.index) await sSet('month:'+id, STATE.allMonths[id]);
+}
+
+async function loadPublicDataFile(){
+  try{
+    const res = await fetch(PUBLIC_DATA_FILE, {cache:'no-store'});
+    if(!res.ok) return false;
+    const buf = await res.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    return loadWorkbookIntoState(wb);
+  }catch(e){
+    console.warn('No se pudo cargar datos.xlsx', e);
+    return false;
+  }
+}
+
+async function importExcelFile(ev){
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = '';
+  if(!file) return;
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    if(loadWorkbookIntoState(wb)){
+      await persistStateMonths();
+      alert('Excel cargado. Se importaron los meses encontrados y se actualizó la comparativa.');
+      render();
+    }else{
+      alert('No encontré solapas con el formato esperado. Usá el botón "Formato Excel" para descargar una plantilla.');
+    }
+  }catch(e){
+    console.error(e);
+    alert('No pude leer el Excel. Verificá que sea .xlsx, .xls o .csv.');
+  }
+}
+function downloadExcelTemplate(){
+  const wb = XLSX.utils.book_new();
+  const mes = STATE.currentId || browserMonthId();
+  const prestacionesHeaders = [['Mes','SLA Acordado','Prestacion','Ingresado','Verificado/Resuelto','SLA OK','SLA NO OK','SLA BA Colaborativa']];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(prestacionesHeaders.concat(ORDENAMIENTO_PRESTACIONES_DEFAULT.map(n=>[mes,0,n,0,0,0,0,0]))), 'GO Ordenamiento');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(prestacionesHeaders.concat(VENTA_PRESTACIONES_DEFAULT.map(n=>[mes,0,n,0,0,0,0,0]))), 'GO Venta');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(prestacionesHeaders.concat([[mes,0,'',0,0,0,0,0]])), 'GO Espacio Prestaciones');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Comuna','Ingresados','Verificados','Cobertura'],...COMUNAS.map(c=>[mes,c,0,0,0])]), 'Relevamiento Areas Gastronomicas');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Relevamiento','Avance %'],[mes,'',0]]), 'Relevamientos');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Indicador','Valor'],[mes,'',0]]), 'Deck Power BI');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Comuna','Secuestros','Decomisos %'],...COMUNAS.map(c=>[mes,c,0,0])]), 'Secuestros Decomisos');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Comuna','Positivos','Negativos','Grupo'],...COMUNAS.map(c=>[mes,c,0,0,'Resto de CABA'])]), 'GO Espacio Comunas');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Fecha','Operativo','Participantes','Secuestrado','Cantidad Secuestros'],[mes,'','','','',0]]), 'Grandes Operativos');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Fecha','Lugar','Recursos'],[mes,'','','']]), 'GO Logistica Desalojos');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Mes','Planificado','Verificado/Resuelto'],[mes,0,0]]), 'GO Logistica Cableado');
+  XLSX.writeFile(wb, 'formato-reporte-mensual-historico.xlsx');
+}
+function readImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function boot(){
+  if(!IS_EDITOR && await loadPublicDataFile()){ render(); return; }
+  STATE.index = await sGet('months-index', []);
+  if(STATE.index.length===0){
+    const now = new Date();
+    const id = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    const d = defaultMonth(id);
+    STATE.index=[id];
+    await sSet('months-index', STATE.index);
+    await sSet('month:'+id, d);
+  }
+  const lastId = STATE.index[STATE.index.length-1];
+  await selectMonth(lastId);
+}
+
+async function selectMonth(id){
+  if(!IS_EDITOR && STATE.allMonths[id]){
+    STATE.currentId = id;
+    STATE.data = STATE.allMonths[id];
+    const idxPos = STATE.index.indexOf(id);
+    STATE.prevData = idxPos>0 ? STATE.allMonths[STATE.index[idxPos-1]] : null;
+    render();
+    return;
+  }
+  STATE.currentId = id;
+  const raw = await sGet('month:'+id, defaultMonth(id));
+  STATE.data = ensureShape(raw, id);
+  const idxPos = STATE.index.indexOf(id);
+  STATE.prevData = idxPos>0 ? ensureShape(await sGet('month:'+STATE.index[idxPos-1], defaultMonth(STATE.index[idxPos-1])), STATE.index[idxPos-1]) : null;
+  render();
+}
+
+function nextMonthGuess(){
+  if(!STATE.currentId) return '';
+  const [y,m] = STATE.currentId.split('-').map(Number);
+  let ny=y, nm=m+1; if(nm>12){nm=1;ny++;}
+  return ny+'-'+String(nm).padStart(2,'0');
+}
+
+async function createNewMonth(){
+  const input = prompt('Ingresá el nuevo mes en formato AAAA-MM (ej: 2026-07):', nextMonthGuess());
+  if(!input) return;
+  const id = input.trim();
+  if(!/^\d{4}-\d{2}$/.test(id)){ alert('Formato inválido. Usá AAAA-MM.'); return; }
+  if(!STATE.index.includes(id)){
+    STATE.index.push(id); STATE.index.sort();
+    await sSet('months-index', STATE.index);
+    await sSet('month:'+id, defaultMonth(id));
+  }
+  await selectMonth(id);
+}
+
+async function closeMonth(){
+  if(!confirm('¿Cerrar el informe de '+STATE.data.label+'? Va a quedar archivado. Podés reabrirlo después si necesitás corregir algo.')) return;
+  STATE.data.closed = true; STATE.data.closedAt = Date.now();
+  await sSet('month:'+STATE.data.id, STATE.data);
+  render();
+}
+async function reopenMonth(){
+  if(!confirm('¿Reabrir este mes para editarlo?')) return;
+  STATE.data.closed = false;
+  await sSet('month:'+STATE.data.id, STATE.data);
+  render();
+}
+
+async function loadAllMonths(){
+  for(const id of STATE.index){
+    if(!STATE.allMonths[id]) STATE.allMonths[id] = ensureShape(await sGet('month:'+id, defaultMonth(id)), id);
+  }
+}
+
+function previousMonthIds(n){
+  const pos = STATE.index.indexOf(STATE.currentId);
+  const start = Math.max(0, pos-n);
+  return STATE.index.slice(start, pos);
+}
+
+// ---------- rendering shell ----------
+const root = document.getElementById('root');
+let chartInstances = [];
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+function resetCharts(){ chartInstances.forEach(c=>c.destroy()); chartInstances = []; }
+function chartWrap(title, wide=false){ return el(`<div class="chart-box ${wide?'wide':''}"><h4>${title}</h4><canvas></canvas></div>`); }
+const barValueLabels = {
+  id:'barValueLabels',
+  afterDatasetsDraw(chart){
+    if(chart.config.type!=='bar') return;
+    const ctx = chart.ctx;
+    ctx.save(); ctx.fillStyle='#10293D'; ctx.font='700 11px Inter, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    chart.data.datasets.forEach((dataset, datasetIndex)=>{
+      chart.getDatasetMeta(datasetIndex).data.forEach((bar, index)=>{
+        const value = Number(dataset.data[index]||0);
+        ctx.fillText(fmt(value), bar.x, Math.min(bar.y, chart.chartArea.bottom) - 5);
+      });
+    });
+    ctx.restore();
+  }
+};
+function addChart(panel, title, config, wide=false, height){
+  const box = chartWrap(title, wide);
+  if(height){
+    box.style.minHeight = `${height + 58}px`;
+    box.querySelector('canvas').style.setProperty('height', `${height}px`, 'important');
+  }
+  panel.appendChild(box);
+  if(!window.Chart){ box.appendChild(el('<div class="empty-note">No se pudo cargar la librería de gráficos.</div>')); return; }
+  if(config.type==='bar') config.plugins = (config.plugins||[]).concat(barValueLabels);
+  chartInstances.push(new Chart(box.querySelector('canvas'), config));
+}
+function shortLabel(v){ const s=String(v||''); return s.length>24 ? s.slice(0,22)+'…' : s; }
+function sum(arr, key){ return (arr||[]).reduce((n,x)=>n+Number(x[key]||0),0); }
+function prestacionesChartData(arr){ return (arr||[]).filter(p=>p.nombre); }
+function wrapChartLabel(value, maxChars=34){
+  const words = String(value||'').trim().split(/\s+/);
+  const lines = []; let line = '';
+  words.forEach(word=>{
+    const next = line ? `${line} ${word}` : word;
+    if(line && next.length > maxChars){ lines.push(line); line = word; }
+    else line = next;
+  });
+  if(line) lines.push(line);
+  return lines.length ? lines : ['Sin nombre'];
+}
+
+async function render(){
+  resetCharts();
+  const d = STATE.data; const closed = d.closed;
+  const readOnly = !IS_EDITOR;
+  let controlsHtml = '<select id="monthSelect"></select>';
+  controlsHtml += `<span class="status-pill ${readOnly?'status-closed':(closed?'status-closed':'status-open')}">${readOnly ? 'Solo lectura' : (closed? '🔒 Cerrado':'✏️ Abierto — editando')}</span>`;
+  if(IS_EDITOR){
+    controlsHtml += `<button class="btn-mint" id="btnNewMonth">+ Nuevo mes</button>
+        <button class="btn-mint" id="btnImportExcel" ${closed?'disabled':''}>Cargar Excel</button>
+        <button class="btn-outline" id="btnTemplateExcel">Formato Excel</button>
+        ${closed ? `<button class="btn-outline" id="btnReopen">Reabrir mes</button>` : `<button class="btn-yellow" id="btnClose">Cerrar informe del mes</button>`}
+        <input type="file" id="excelInput" class="file-input-hidden" accept=".xlsx,.xls,.csv"/>`;
+  }else{
+    controlsHtml += '<span class="mode-note">Datos publicados desde datos.xlsx</span>';
+  }
+  root.innerHTML = `
+    <div class="app-shell ${IS_EDITOR?'editor-mode':'public-mode'}">
+    <div class="topbar"><div class="topbar-inner">
+      <h1>Reporte Mensual — Grandes Operativos</h1>
+      <div class="sub">Ciudad Autónoma de Buenos Aires</div>
+      <div class="controls">${controlsHtml}</div>
+    </div></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="panel" id="panel"></div>
+    </div>
+  `;
+  const sel = document.getElementById('monthSelect');
+  STATE.index.forEach(id=>{
+    const opt = document.createElement('option');
+    opt.value=id; opt.textContent = id===d.id ? d.label+' (actual)' : id;
+    if(id===d.id) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  sel.onchange = ()=> selectMonth(sel.value);
+  if(IS_EDITOR){
+    document.getElementById('btnNewMonth').onclick = createNewMonth;
+    document.getElementById('btnImportExcel').onclick = ()=> document.getElementById('excelInput').click();
+    document.getElementById('btnTemplateExcel').onclick = downloadExcelTemplate;
+    document.getElementById('excelInput').onchange = importExcelFile;
+    if(closed){ document.getElementById('btnReopen').onclick = reopenMonth; } else { document.getElementById('btnClose').onclick = closeMonth; }
+  }
+
+  const tabs = [
+    ['inicio','Inicio'],
+    ['operativos','1. Grandes Operativos'],
+    ['goOrdenamiento','2. GO Ordenamiento'],
+    ['goVenta','3. GO Venta no autorizada'],
+    ['goEspacio','4. GO Intervención espacio público'],
+    ['goLogistica','5. GO Logística'],
+    ['historial','Historial'],
+  ];
+  const switchTab = key=>{ STATE.activeTab=key; render(); };
+  const tabsEl = document.getElementById('tabs');
+  tabs.forEach(([key,label])=>{
+    const t = el(`<div class="tab ${STATE.activeTab===key?'active':''}" data-key="${key}">${label}</div>`);
+    t.onclick = ()=>switchTab(key);
+    tabsEl.appendChild(t);
+  });
+
+  const panel = document.getElementById('panel'); panel.innerHTML='';
+  if(readOnly) panel.appendChild(el(`<div class="closed-banner">Vista pública de solo lectura. El archivo <b>datos.xlsx</b> conserva el histórico mensual y alimenta los gráficos.</div>`));
+  else if(closed) panel.appendChild(el(`<div class="closed-banner">Este mes está cerrado y archivado. Los valores no se pueden editar. Usá "Reabrir mes" si necesitás corregir algo.</div>`));
+
+  const renderers = {
+    inicio: renderInicio, operativos: renderOperativos, goOrdenamiento: renderGoOrdenamiento, goVenta: renderGoVenta,
+    goEspacio: renderGoEspacio, goLogistica: renderGoLogistica, historial: renderHistorial
+  };
+  await renderers[STATE.activeTab](panel);
+  makeTablesScrollable(panel);
+}
+
+function makeTablesScrollable(panel){
+  panel.querySelectorAll('table').forEach(table=>{
+    if(table.parentElement.classList.contains('table-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    wrap.setAttribute('aria-label', 'Tabla desplazable horizontalmente');
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  });
+}
+
+function deltaSpan(curr, prev, opts={}){
+  if(prev===undefined || prev===null) return '';
+  const diff = curr - prev;
+  const suffix = opts.pct ? '' : '';
+  if(Math.abs(diff) < 0.05) return `<span class="delta flat">= vs mes ant.</span>`;
+  const cls = diff>0 ? 'up':'down';
+  const arrow = diff>0 ? '▲':'▼';
+  return `<span class="delta ${cls}">${arrow} ${Math.abs(Math.round(diff*10)/10)}${suffix} vs mes ant.</span>`;
+}
+
+// ================= INICIO =================
+function renderInicio(panel){
+  panel.classList.add('home-panel');
+  panel.appendChild(el(`<section class="home-hero"><h2>Reporte mensual</h2><p>Seleccioná una sección para visualizar y cargar los indicadores del mes.</p></section>`));
+  const sections = [
+    ['operativos','1','Grandes Operativos','Operativos y secuestros del mes'],
+    ['goOrdenamiento','2','GO Ordenamiento','Cobertura, SLA y relevamientos'],
+    ['goVenta','3','GO Venta no autorizada','Secuestros y decomisos por comuna'],
+    ['goEspacio','4','GO Intervención espacio público','Operativos positivos y negativos'],
+    ['goLogistica','5','GO Logística','Cableado y desalojos'],
+    ['historial','↗','Historial','Consulta de meses anteriores','history']
+  ];
+  const grid = el('<div class="home-grid"></div>');
+  sections.forEach(([key,number,title,description,extraClass=''])=>{
+    const card = el(`<button type="button" class="home-card ${extraClass}"><span class="home-card-number">${number}</span><span class="home-card-title">${title}</span><span class="home-card-desc">${description}</span></button>`);
+    card.onclick = ()=>{ STATE.activeTab=key; render(); };
+    grid.appendChild(card);
+  });
+  panel.appendChild(grid);
+}
+
+// ================= RESUMEN =================
+async function renderResumen(panel){
+  await loadAllMonths();
+  const d = STATE.data;
+  const opCount = d.grandesOperativos.operativos.length;
+  const opSec = sum(d.grandesOperativos.operativos, 'cantidadSecuestros');
+  const ventaSec = sum(d.goVenta.secuestrosPorComuna, 'secuestros');
+  const ventaDec = d.goVenta.secuestrosPorComuna.length ? d.goVenta.secuestrosPorComuna.reduce((total,r)=>total+Number(r.decomisos||0),0) / d.goVenta.secuestrosPorComuna.length : 0;
+  const espPos = sum(d.goEspacioPublico.operativosPorComuna, 'positivos');
+  const espNeg = sum(d.goEspacioPublico.operativosPorComuna, 'negativos');
+  const cab = d.goLogistica.cableado;
+  const desalojos = d.goLogistica.desalojos.length;
+  panel.appendChild(el(`<h3 class="section-title">Resumen ejecutivo</h3><p class="section-desc">Indicadores principales del mes, generados automáticamente desde los datos cargados.</p>`));
+  panel.appendChild(el(`<div class="kpi-grid">
+    <div class="kpi"><div class="label">1. Grandes Operativos</div><div class="value">${fmt(opCount)}</div><div class="note">Secuestros: ${fmt(opSec)}</div></div>
+    <div class="kpi"><div class="label">3. GO Venta no autorizada</div><div class="value">${fmt(ventaSec)}</div><div class="note">Decomisos promedio: ${fmtPct(ventaDec)}</div></div>
+    <div class="kpi"><div class="label">4. GO Intervención espacio público</div><div class="value">${fmtPct(pct(espPos, espPos+espNeg))}</div><div class="note">${fmt(espPos)} positivos / ${fmt(espNeg)} negativos</div></div>
+    <div class="kpi"><div class="label">5. GO Logística</div><div class="value">${fmtPct(pct(cab.verificado, cab.planificado))}</div><div class="note">Desalojos: ${fmt(desalojos)}</div></div>
+  </div>`));
+
+  panel.appendChild(el(`<h4 class="summary-go-title">2. GO Ordenamiento</h4>`));
+  const ordenamientoGrid = el('<div class="chart-grid"></div>'); panel.appendChild(ordenamientoGrid);
+  renderPrestacionesCharts(ordenamientoGrid, d.goOrdenamiento.prestaciones, 'Cobertura e SLA por prestación');
+
+  panel.appendChild(el(`<h4 class="summary-go-title">3. GO Venta no autorizada</h4>`));
+  const ventaGrid = el('<div class="chart-grid"></div>'); panel.appendChild(ventaGrid);
+  renderVentaCharts(ventaGrid, d.goVenta.secuestrosPorComuna);
+
+  panel.appendChild(el(`<h4 class="summary-go-title">4. GO Intervención espacio público</h4>`));
+  const espacioGrid = el('<div class="chart-grid"></div>'); panel.appendChild(espacioGrid);
+  renderEspacioCharts(espacioGrid, d.goEspacioPublico.operativosPorComuna);
+
+}
+
+function renderPrestacionesCharts(panel, arr, title='Cobertura y SLA por prestación'){
+  const rows = prestacionesChartData(arr);
+  if(rows.length===0) return;
+  const board = el(`<section class="prestaciones-board">
+    <div class="prestaciones-board-head"><h4>${title}</h4><p>Lectura por prestación: los nombres se muestran completos y cada barra indica el porcentaje correspondiente.</p></div>
+    <div class="prestacion-row header"><div>Prestación</div><div>Cobertura</div><div>SLA BA Colaborativa</div><div>SLA de casos</div></div>
+  </section>`);
+  rows.forEach(p=>{
+    const cobertura = pct(p.verificado, p.bucket);
+    const slaColaborativa = Number(p.slaColaborativaPct||0);
+    const row = el(`<div class="prestacion-row">
+      <div class="prestacion-name"></div>
+      <div class="metric"><div class="metric-label"><span>Cobertura</span><b>${fmtPct(cobertura)}</b></div><div class="progress-track"><span class="progress-fill coverage"></span></div></div>
+      <div class="metric"><div class="metric-label"><span>SLA BA Colaborativa</span><b>${fmtPct(slaColaborativa)}</b></div><div class="progress-track"><span class="progress-fill sla"></span></div></div>
+      <div class="sla-counts"><span class="sla-count ok">OK: ${fmt(p.slaOk||0)}</span><span class="sla-count late">SLA no OK: ${fmt(p.fueraSla||0)}</span></div>
+    </div>`);
+    row.querySelector('.prestacion-name').textContent = p.nombre;
+    row.querySelector('.progress-fill.coverage').style.width = `${Math.max(0,Math.min(100,cobertura))}%`;
+    row.querySelector('.progress-fill.sla').style.width = `${Math.max(0,Math.min(100,slaColaborativa))}%`;
+    board.appendChild(row);
+  });
+  panel.appendChild(board);
+}
+function renderVentaCharts(panel, rows){
+  if(!rows || rows.length===0) return;
+  addChart(panel, 'Secuestros y decomisos por comuna', {type:'bar', data:{labels:rows.map(r=>r.comuna), datasets:[{label:'Secuestros', data:rows.map(r=>Number(r.secuestros||0)), backgroundColor:'#10293D'},{label:'Decomisos', data:rows.map(r=>Number(r.decomisos||0)), backgroundColor:'#FFC800'}]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}}}}, true);
+}
+function renderEspacioCharts(panel, rows){
+  if(!rows || rows.length===0) return;
+  addChart(panel, 'Operativos positivos y negativos por comuna', {type:'bar', data:{labels:rows.map(r=>r.comuna), datasets:[{label:'Positivos', data:rows.map(r=>Number(r.positivos||0)), backgroundColor:'#2FAE85'},{label:'Negativos', data:rows.map(r=>Number(r.negativos||0)), backgroundColor:'#D9534F'}]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}}}}, true);
+}
+function renderLogisticaCharts(panel, logistica){
+  const c = logistica.cableado || {};
+  addChart(panel, 'Planificación de cableado', {type:'doughnut', data:{labels:['Verificado','Pendiente'], datasets:[{data:[Number(c.verificado||0), Number(c.pendiente||0)], backgroundColor:['#7FE0C4','#FFC800']}]}, options:{responsive:true, maintainAspectRatio:false}});
+}
+
+// ================= 1. GRANDES OPERATIVOS =================
+function renderOperativos(panel){
+  const d = STATE.data.grandesOperativos;
+  const disabled = !IS_EDITOR || STATE.data.closed;
+  panel.appendChild(el(`<h3 class="section-title">Grandes Operativos del mes</h3><p class="section-desc">Listado de operativos, participantes y secuestros del mes.</p>`));
+
+  const agrupados = new Map();
+  d.operativos.forEach(op=>{
+    const nombre = String(op.nombre||'').trim().replace(/\s+/g,' ') || 'Sin operativo / lugar';
+    const clave = nombre.toLocaleLowerCase('es-AR');
+    const grupo = agrupados.get(clave) || {nombre, cantidad:0};
+    grupo.cantidad += Number(op.cantidadSecuestros||0);
+    agrupados.set(clave, grupo);
+  });
+  if(agrupados.size){
+    const chartGrid = el('<div class="chart-grid"></div>'); panel.appendChild(chartGrid);
+    const grupos = [...agrupados.values()];
+    addChart(chartGrid, 'Secuestros por operativo', {type:'bar', data:{labels:grupos.map(g=>wrapChartLabel(g.nombre,24)), datasets:[{label:'Cantidad secuestros', data:grupos.map(g=>g.cantidad), backgroundColor:'#10293D'}]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true, ticks:{precision:0}}}}}, true);
+  }
+
+  const actions = el(`<div class="dyn-table-actions"></div>`);
+  if(!disabled){
+    const btn = el(`<button class="add-row-btn">+ Agregar operativo</button>`);
+    btn.onclick = ()=>{ d.operativos.push(defaultOperativo()); render(); };
+    actions.appendChild(btn);
+  }
+  panel.appendChild(actions);
+
+  if(d.operativos.length===0){
+    panel.appendChild(el(`<div class="empty-note">Todavía no cargaste operativos este mes.</div>`));
+    return;
+  }
+  const table = el(`<table><thead><tr>
+    <th>Fecha</th><th>Operativo / lugar</th><th>Participantes</th><th>Qué se secuestró</th><th>Cant. secuestros</th><th></th>
+  </tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  d.operativos.forEach((op,i)=>{
+    const tr = el(`<tr>
+      <td><input type="text" data-i="${i}" data-k="fecha" value="${op.fecha||''}" style="width:80px;" ${disabled?'disabled':''}/></td>
+      <td><input type="text" data-i="${i}" data-k="nombre" value="${op.nombre||''}" style="width:120px;" ${disabled?'disabled':''}/></td>
+      <td><textarea data-i="${i}" data-k="participantes" style="width:130px;" ${disabled?'disabled':''}>${op.participantes||''}</textarea></td>
+      <td><textarea data-i="${i}" data-k="secuestrado" style="width:130px;" ${disabled?'disabled':''}>${op.secuestrado||''}</textarea></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="cantidadSecuestros" value="${op.cantidadSecuestros||0}" style="width:60px;" ${disabled?'disabled':''}/></td>
+      <td>${disabled?'':'<span class="del-btn">✕</span>'}</td>
+    </tr>`);
+    tr.querySelectorAll('input,textarea').forEach(inp=>{
+      inp.oninput = ()=>{
+        const ii=inp.dataset.i, kk=inp.dataset.k;
+        d.operativos[ii][kk] = kk==='cantidadSecuestros' ? (parseFloat(inp.value)||0) : inp.value;
+        scheduleSave();
+      };
+    });
+    const delBtn = tr.querySelector('.del-btn');
+    if(delBtn) delBtn.onclick = ()=>{ d.operativos.splice(i,1); scheduleSave(); render(); };
+    tbody.appendChild(tr);
+  });
+  panel.appendChild(table);
+}
+
+// ================= generic: cobertura + SLA por prestación =================
+function renderPrestacionesTable(panel, prestacionesArr, disabled, opts={}){
+  const actions = el(`<div class="dyn-table-actions"></div>`);
+  if(!disabled){
+    const btn = el(`<button class="add-row-btn">+ Agregar prestación</button>`);
+    btn.onclick = ()=>{ prestacionesArr.push(emptyPrestacion('Nueva prestación')); render(); };
+    actions.appendChild(btn);
+  }
+  panel.appendChild(actions);
+  const table = el(`<table><thead><tr>
+    <th>SLA ACORDADO</th><th>Prestación</th><th>Ingresado</th><th>VERIFICADO/RESUELTO</th><th>% Cobertura</th><th>SLA OK</th><th>SLA NO OK</th><th>SLA BA Colaborativa</th><th></th>
+  </tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  prestacionesArr.forEach((p,i)=>{
+    const covPct = pct(p.verificado, p.bucket);
+    const isVerificationOnly = ['buzon','cableado'].includes(normKey(p.nombre));
+    const tr = el(`<tr>
+      <td><input type="number" min="0" step="1" data-i="${i}" data-k="slaAcordado" value="${p.slaAcordado||0}" ${disabled?'disabled':''}/></td>
+      <td><input type="text" data-i="${i}" data-k="nombre" value="${p.nombre||''}" style="width:160px;text-align:left;" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="bucket" value="${p.bucket||0}" ${disabled?'disabled':''}/></td>
+      <td><span class="verified-value"><input type="number" min="0" data-i="${i}" data-k="verificado" value="${p.verificado||0}" ${disabled?'disabled':''}/>${isVerificationOnly?'<span class="verification-note">(VERIFICADO)</span>':''}</span></td>
+      <td class="covpct-${i}">${fmtPct(covPct)}</td>
+      <td><span class="sla-ok-input"><input type="number" min="0" data-i="${i}" data-k="slaOk" value="${p.slaOk||0}" ${disabled?'disabled':''}/></span></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="fueraSla" value="${p.fueraSla||0}" ${disabled?'disabled':''}/></td>
+      <td><span class="percent-input"><input type="number" min="0" max="100" step="1" data-i="${i}" data-k="slaColaborativaPct" value="${p.slaColaborativaPct||0}" ${disabled?'disabled':''}/><b>%</b></span></td>
+      <td>${disabled?'':'<span class="del-btn">✕</span>'}</td>
+    </tr>`);
+    tr.querySelectorAll('input').forEach(inp=>{
+      inp.oninput = ()=>{
+        const ii=inp.dataset.i, kk=inp.dataset.k;
+        prestacionesArr[ii][kk] = kk==='nombre' ? inp.value : (kk==='slaColaborativaPct' ? normalizePercentage(inp.value) : (parseFloat(inp.value)||0));
+        if(kk==='bucket'||kk==='verificado'){
+          const np = pct(prestacionesArr[ii].verificado, prestacionesArr[ii].bucket);
+          table.querySelector('.covpct-'+ii).textContent = fmtPct(np);
+        }
+        scheduleSave();
+      };
+    });
+    const delBtn = tr.querySelector('.del-btn');
+    if(delBtn) delBtn.onclick = ()=>{ prestacionesArr.splice(i,1); scheduleSave(); render(); };
+    tbody.appendChild(tr);
+  });
+  panel.appendChild(table);
+}
+
+function renderVentaManterosTable(panel, prestacionesArr, disabled){
+  const actions = el(`<div class="dyn-table-actions"></div>`);
+  if(!disabled){
+    const btn = el(`<button class="add-row-btn">+ Agregar prestación</button>`);
+    btn.onclick = ()=>{ prestacionesArr.push(emptyPrestacion('Nueva prestación')); render(); };
+    actions.appendChild(btn);
+  }
+  panel.appendChild(actions);
+  const table = el(`<table><thead><tr>
+    <th>Mes</th><th>SLA Acordado</th><th>Prestación</th><th>Ingresado</th><th>Verificado - Resuelto</th><th>SLA OK</th><th>SLA NO OK</th><th>SLA BA Colaborativa</th><th></th>
+  </tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  prestacionesArr.forEach((p,i)=>{
+    const tr = el(`<tr>
+      <td>${STATE.data.label}</td>
+      <td><input type="number" min="0" step="1" data-i="${i}" data-k="slaAcordado" value="${Math.round(p.slaAcordado||0)}" ${disabled?'disabled':''}/></td>
+      <td><input type="text" data-i="${i}" data-k="nombre" value="${p.nombre||''}" style="width:180px;text-align:left;" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" step="1" data-i="${i}" data-k="bucket" value="${p.bucket||0}" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" step="1" data-i="${i}" data-k="verificado" value="${p.verificado||0}" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" step="1" data-i="${i}" data-k="slaOk" value="${p.slaOk||0}" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" step="1" data-i="${i}" data-k="fueraSla" value="${p.fueraSla||0}" ${disabled?'disabled':''}/></td>
+      <td><span class="percent-input"><input type="number" min="0" max="100" step="1" data-i="${i}" data-k="slaColaborativaPct" value="${Math.round(p.slaColaborativaPct||0)}" ${disabled?'disabled':''}/><b>%</b></span></td>
+      <td>${disabled?'':'<span class="del-btn">âœ•</span>'}</td>
+    </tr>`);
+    tr.querySelectorAll('input').forEach(inp=>{
+      inp.oninput = ()=>{
+        const ii=inp.dataset.i, kk=inp.dataset.k;
+        prestacionesArr[ii][kk] = kk==='nombre' ? inp.value : (kk==='slaColaborativaPct' ? normalizePercentage(inp.value) : Math.round(parseFloat(inp.value)||0));
+        scheduleSave();
+      };
+    });
+    const delBtn = tr.querySelector('.del-btn');
+    if(delBtn) delBtn.onclick = ()=>{ prestacionesArr.splice(i,1); scheduleSave(); render(); };
+    tbody.appendChild(tr);
+  });
+  panel.appendChild(table);
+}
+
+function renderSlaComparison(panel, sectionKey, prestacionesArr){
+  panel.appendChild(el(`<h4 class="subsection-title">Comparativo SLA — últimos 3 meses por prestación</h4>`));
+  const prevIds = previousMonthIds(3);
+  if(prevIds.length===0){
+    panel.appendChild(el(`<div class="empty-note">Todavía no hay meses anteriores cargados para comparar.</div>`));
+    return;
+  }
+  const table = el(`<table class="cmp-table"><thead><tr>
+    <th>Prestación</th>${prevIds.map(id=>`<th>${id}</th>`).join('')}<th>Actual (${STATE.currentId})</th>
+  </tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  prestacionesArr.forEach(p=>{
+    const cells = prevIds.map(id=>{
+      const md = STATE.allMonths[id];
+      const arr = md ? (md[sectionKey] && md[sectionKey].prestaciones) : null;
+      const match = arr ? arr.find(x=>x.nombre===p.nombre) : null;
+      if(!match) return `<td class="cmp-cell">—</td>`;
+      return `<td class="cmp-cell">OK:${fmt(match.slaOk||0)}<br>SLA no OK:${fmt(match.fueraSla||0)}<br>C:${fmtPct(match.slaColaborativaPct||0)}</td>`;
+    }).join('');
+    const tr = el(`<tr><td>${p.nombre}</td>${cells}<td class="cmp-cell"><b>OK:${fmt(p.slaOk||0)}<br>SLA no OK:${fmt(p.fueraSla||0)}<br>C:${fmtPct(p.slaColaborativaPct||0)}</b></td></tr>`);
+    tbody.appendChild(tr);
+  });
+  panel.appendChild(table);
+  panel.appendChild(el(`<div class="hint">OK = SLA OK · SLA no OK = casos no cumplidos · C = SLA tablero BA Colaborativa</div>`));
+}
+
+// ================= 2. GO ORDENAMIENTO =================
+async function renderGoOrdenamiento(panel){
+  await loadAllMonths();
+  const d = STATE.data.goOrdenamiento;
+  const disabled = !IS_EDITOR || STATE.data.closed;
+  const prestaciones = prestacionesChartData(d.prestaciones);
+  const ingresados = sum(prestaciones, 'bucket');
+  const verificados = sum(prestaciones, 'verificado');
+  const fueraSla = sum(prestaciones, 'fueraSla');
+  const promedioSlaColaborativa = prestaciones.length ? prestaciones.reduce((total,p)=>total+Number(p.slaColaborativaPct||0),0) / prestaciones.length : 0;
+  panel.appendChild(el(`<h3 class="section-title">GO Ordenamiento</h3><p class="section-desc">Cobertura de reclamos y SLA por prestación, avances de relevamientos y datos del deck SSOUR (Power BI).</p>`));
+  panel.appendChild(el(`<div class="kpi-grid">
+    <div class="kpi"><div class="label">Cobertura total</div><div class="value">${fmtPct(pct(verificados, ingresados))}</div><div class="note">${fmt(verificados)} verificados de ${fmt(ingresados)} ingresados</div></div>
+    <div class="kpi"><div class="label">SLA BA Colaborativa</div><div class="value">${fmtPct(promedioSlaColaborativa)}</div><div class="note">Promedio entre prestaciones</div></div>
+    <div class="kpi"><div class="label">SLA no OK</div><div class="value">${fmt(fueraSla)}</div><div class="note">Casos acumulados en el mes</div></div>
+  </div>`));
+
+  panel.appendChild(el(`<h4 class="subsection-title">Cobertura de reclamo y SLA por prestación</h4>`));
+  renderPrestacionesTable(panel, d.prestaciones, disabled);
+  const ordCharts = el('<div class="chart-grid"></div>'); panel.appendChild(ordCharts);
+  renderPrestacionesCharts(ordCharts, d.prestaciones);
+  renderSlaComparison(panel, 'goOrdenamiento', d.prestaciones);
+
+  panel.appendChild(el(`<h4 class="subsection-title">RELEVAMIENTO AREAS GASTRONOMICAS</h4>`));
+  const gastroRows = d.relevamientoAreasGastronomicas;
+  const gastroTable = el(`<table><thead><tr><th>Comuna</th><th>Ingresados</th><th>Verificados</th><th>Cobertura</th></tr></thead><tbody></tbody></table>`);
+  const gastroBody = gastroTable.querySelector('tbody');
+  gastroRows.forEach((r,i)=>{
+    const tr = el(`<tr>
+      <td>${r.comuna}</td>
+      <td><input type="number" min="0" data-i="${i}" data-k="ingresados" value="${r.ingresados||0}" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="verificados" value="${r.verificados||0}" ${disabled?'disabled':''}/></td>
+      <td class="gastro-coverage-${i}">${fmtPct(pct(r.verificados,r.ingresados))}</td>
+    </tr>`);
+    tr.querySelectorAll('input').forEach(inp=>{
+      inp.oninput=()=>{
+        const ii=inp.dataset.i, kk=inp.dataset.k;
+        gastroRows[ii][kk]=parseFloat(inp.value)||0;
+        gastroTable.querySelector('.gastro-coverage-'+ii).textContent=fmtPct(pct(gastroRows[ii].verificados,gastroRows[ii].ingresados));
+        updateGastroTotal(); scheduleSave();
+      };
+    });
+    gastroBody.appendChild(tr);
+  });
+  const gastroTotal = el(`<tr class="totrow"><td>GENERAL</td><td id="gastroTotalIngresados">0</td><td id="gastroTotalVerificados">0</td><td id="gastroTotalCobertura">0%</td></tr>`);
+  gastroBody.appendChild(gastroTotal);
+  panel.appendChild(gastroTable);
+  function updateGastroTotal(){
+    const totalIngresados=gastroRows.reduce((total,r)=>total+Number(r.ingresados||0),0);
+    const totalVerificados=gastroRows.reduce((total,r)=>total+Number(r.verificados||0),0);
+    gastroTotal.querySelector('#gastroTotalIngresados').textContent=fmt(totalIngresados);
+    gastroTotal.querySelector('#gastroTotalVerificados').textContent=fmt(totalVerificados);
+    gastroTotal.querySelector('#gastroTotalCobertura').textContent=fmtPct(pct(totalVerificados,totalIngresados));
+  }
+  updateGastroTotal();
+
+  panel.appendChild(el(`<h4 class="subsection-title">Avances de relevamientos</h4>`));
+  const relActions = el(`<div class="dyn-table-actions"></div>`);
+  if(!disabled){
+    const btn = el(`<button class="add-row-btn">+ Agregar relevamiento</button>`);
+    btn.onclick = ()=>{ d.relevamientos.push({nombre:'', avancePct:0}); render(); };
+    relActions.appendChild(btn);
+  }
+  panel.appendChild(relActions);
+  if(d.relevamientos.length===0){
+    panel.appendChild(el(`<div class="empty-note">Sin relevamientos cargados.</div>`));
+  }else{
+    const rt = el(`<table><thead><tr><th>Relevamiento</th><th>% de avance</th><th></th></tr></thead><tbody></tbody></table>`);
+    const rb = rt.querySelector('tbody');
+    d.relevamientos.forEach((r,i)=>{
+      const tr = el(`<tr>
+        <td><input type="text" data-i="${i}" data-k="nombre" value="${r.nombre||''}" style="width:220px;text-align:left;" ${disabled?'disabled':''}/></td>
+        <td><input type="number" min="0" max="100" step="1" data-i="${i}" data-k="avancePct" value="${r.avancePct||0}" ${disabled?'disabled':''}/></td>
+        <td>${disabled?'':'<span class="del-btn">✕</span>'}</td>
+      </tr>`);
+      tr.querySelectorAll('input').forEach(inp=>{
+        inp.oninput=()=>{ const ii=inp.dataset.i,kk=inp.dataset.k; d.relevamientos[ii][kk]= kk==='avancePct'?normalizePercentage(inp.value):inp.value; scheduleSave(); };
+      });
+      const delBtn=tr.querySelector('.del-btn'); if(delBtn) delBtn.onclick=()=>{ d.relevamientos.splice(i,1); scheduleSave(); render(); };
+      rb.appendChild(tr);
+    });
+    panel.appendChild(rt);
+  }
+
+  panel.appendChild(el(`<h4 class="subsection-title">Deck SSOUR (Power BI)</h4>`));
+  panel.appendChild(el(`<div class="hint">Cargá acá los mismos indicadores que se ven en el tablero SSOUR de Power BI, para que quede el registro del mes.</div>`));
+  const shotActions = el(`<div class="dyn-table-actions with-gap"></div>`);
+  if(!disabled){
+    const shotInput = el(`<input type="file" class="file-input-hidden" accept="image/*"/>`);
+    const shotBtn = el(`<button class="secondary-row-btn">Cargar captura Power BI</button>`);
+    shotBtn.onclick = ()=> shotInput.click();
+    shotInput.onchange = async ()=>{
+      const file = shotInput.files && shotInput.files[0];
+      shotInput.value = '';
+      if(!file) return;
+      d.deckImage = await readImageFile(file);
+      scheduleSave();
+      render();
+    };
+    shotActions.appendChild(shotBtn);
+    shotActions.appendChild(shotInput);
+    if(d.deckImage){
+      const clearShot = el(`<button class="secondary-row-btn">Quitar captura</button>`);
+      clearShot.onclick = ()=>{ d.deckImage=''; scheduleSave(); render(); };
+      shotActions.appendChild(clearShot);
+    }
+  }
+  panel.appendChild(shotActions);
+  if(d.deckImage) panel.appendChild(el(`<div class="deck-shot"><img src="${d.deckImage}" alt="Captura Power BI Deck SSOUR"/></div>`));
+
+  const deckActions = el(`<div class="dyn-table-actions"></div>`);
+  if(!disabled){
+    const btn = el(`<button class="add-row-btn">+ Agregar indicador</button>`);
+    btn.onclick = ()=>{ d.deckSSOUR.push({indicador:'', valor:''}); render(); };
+    deckActions.appendChild(btn);
+  }
+  panel.appendChild(deckActions);
+  if(d.deckSSOUR.length===0){
+    panel.appendChild(el(`<div class="empty-note">Sin indicadores cargados.</div>`));
+  }else{
+    const dt = el(`<table><thead><tr><th>Indicador</th><th>Valor</th><th></th></tr></thead><tbody></tbody></table>`);
+    const db = dt.querySelector('tbody');
+    d.deckSSOUR.forEach((x,i)=>{
+      const tr = el(`<tr>
+        <td><input type="text" data-i="${i}" data-k="indicador" value="${x.indicador||''}" style="width:220px;text-align:left;" ${disabled?'disabled':''}/></td>
+        <td><input type="text" data-i="${i}" data-k="valor" value="${x.valor||''}" ${disabled?'disabled':''}/></td>
+        <td>${disabled?'':'<span class="del-btn">✕</span>'}</td>
+      </tr>`);
+      tr.querySelectorAll('input').forEach(inp=>{
+        inp.oninput=()=>{ const ii=inp.dataset.i,kk=inp.dataset.k; d.deckSSOUR[ii][kk]=inp.value; scheduleSave(); };
+      });
+      const delBtn=tr.querySelector('.del-btn'); if(delBtn) delBtn.onclick=()=>{ d.deckSSOUR.splice(i,1); scheduleSave(); render(); };
+      db.appendChild(tr);
+    });
+    panel.appendChild(dt);
+  }
+}
+
+// ================= 3. GO VENTA NO AUTORIZADA =================
+async function renderGoVenta(panel){
+  await loadAllMonths();
+  const d = STATE.data.goVenta;
+  const disabled = !IS_EDITOR || STATE.data.closed;
+  const prestaciones = prestacionesChartData(d.prestaciones);
+  const ingresados = sum(prestaciones, 'bucket');
+  const verificados = sum(prestaciones, 'verificado');
+  const slaNoOk = sum(prestaciones, 'fueraSla');
+  const slaColaborativa = prestaciones.length ? prestaciones.reduce((total,p)=>total+Number(p.slaColaborativaPct||0),0) / prestaciones.length : 0;
+  panel.appendChild(el(`<h3 class="section-title">GO Venta no autorizada</h3><p class="section-desc">Indicadores de cobertura y secuestros por comuna.</p>`));
+  panel.appendChild(el(`<div class="kpi-grid">
+    <div class="kpi"><div class="label">Cobertura total</div><div class="value">${fmtPct(pct(verificados, ingresados))}</div><div class="note">${fmt(verificados)} verificados de ${fmt(ingresados)} ingresados</div></div>
+    <div class="kpi"><div class="label">SLA BA Colaborativa</div><div class="value">${fmtPct(slaColaborativa)}</div><div class="note">Promedio entre prestaciones</div></div>
+    <div class="kpi"><div class="label">SLA no OK</div><div class="value">${fmt(slaNoOk)}</div><div class="note">Casos acumulados en el mes</div></div>
+  </div>`));
+
+  panel.appendChild(el(`<h4 class="subsection-title">Manteros</h4>`));
+  renderVentaManterosTable(panel, d.prestaciones, disabled);
+
+  panel.appendChild(el(`<h4 class="subsection-title">Secuestros y decomisos por comuna</h4>`));
+  const rows = d.secuestrosPorComuna;
+  const previousByComuna = new Map(((STATE.prevData && STATE.prevData.goVenta && STATE.prevData.goVenta.secuestrosPorComuna)||[]).map(r=>[r.comuna, Number(r.decomisos||0)]));
+  const table = el(`<table><thead><tr><th>Comuna</th><th>Secuestros</th><th>Decomisos</th><th>Variación con el mes anterior</th></tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  let totS=0, totD=0;
+  rows.forEach((r,i)=>{
+    totS += Number(r.secuestros||0); totD += Number(r.decomisos||0);
+    const anterior = previousByComuna.get(r.comuna);
+    const variacion = anterior===undefined ? '—' : ((Number(r.decomisos||0)-anterior)>=0 ? '+' : '') + fmt(Number(r.decomisos||0)-anterior) + ' pp';
+    const tr = el(`<tr>
+      <td>${r.comuna}</td>
+      <td><input type="number" min="0" data-i="${i}" data-k="secuestros" value="${r.secuestros||0}" ${disabled?'disabled':''}/></td>
+      <td><span class="percent-input"><input type="number" min="0" max="100" step="1" data-i="${i}" data-k="decomisos" value="${r.decomisos||0}" ${disabled?'disabled':''}/><b>%</b></span></td>
+      <td>${variacion}</td>
+    </tr>`);
+    tr.querySelectorAll('input').forEach(inp=>{
+      inp.oninput=()=>{
+        const ii=inp.dataset.i, kk=inp.dataset.k;
+        rows[ii][kk]=kk==='decomisos' ? normalizePercentage(inp.value) : (parseFloat(inp.value)||0);
+        recomputeVentaTotals(); scheduleSave();
+      };
+    });
+    tbody.appendChild(tr);
+  });
+  const promedioDecomisos = rows.length ? rows.reduce((s,r)=>s+Number(r.decomisos||0),0)/rows.length : 0;
+  const totRow = el(`<tr class="totrow"><td>GENERAL</td><td id="vTotS">${fmt(totS)}</td><td id="vTotD">${fmtPct(promedioDecomisos)}</td><td>—</td></tr>`);
+  tbody.appendChild(totRow);
+  panel.appendChild(table);
+
+  function recomputeVentaTotals(){
+    let ts=0, td2=0;
+    rows.forEach(r=>{ ts+=Number(r.secuestros||0); td2+=Number(r.decomisos||0); });
+    document.getElementById('vTotS').textContent=fmt(ts);
+    const promedio = rows.length ? rows.reduce((sum,r)=>sum+Number(r.decomisos||0),0)/rows.length : 0;
+    document.getElementById('vTotD').textContent=fmtPct(promedio);
+  }
+
+  // vs mes pasado
+  if(STATE.prevData && STATE.prevData.goVenta){
+    const prevRows = STATE.prevData.goVenta.secuestrosPorComuna||[];
+    let pS=0,pD=0; prevRows.forEach(r=>{ pS+=Number(r.secuestros||0); pD+=Number(r.decomisos||0); });
+    const promedioActual = rows.length ? rows.reduce((s,r)=>s+Number(r.decomisos||0),0)/rows.length : 0;
+    const promedioAnterior = prevRows.length ? prevRows.reduce((s,r)=>s+Number(r.decomisos||0),0)/prevRows.length : 0;
+    panel.appendChild(el(`<div class="hint">Secuestros generales: ${fmt(totS)} ${deltaSpan(totS,pS)} · Decomisos promedio: ${fmtPct(promedioActual)} ${deltaSpan(promedioActual, promedioAnterior)}</div>`));
+  }
+}
+
+// ================= 4. GO INTERVENCIÓN ESPACIO PÚBLICO =================
+async function renderGoEspacio(panel){
+  await loadAllMonths();
+  const d = STATE.data.goEspacioPublico;
+  const disabled = !IS_EDITOR || STATE.data.closed;
+  const prestaciones = prestacionesChartData(d.prestaciones);
+  const ingresados = sum(prestaciones, 'bucket');
+  const verificados = sum(prestaciones, 'verificado');
+  const slaNoOk = sum(prestaciones, 'fueraSla');
+  const slaColaborativa = prestaciones.length ? prestaciones.reduce((total,p)=>total+Number(p.slaColaborativaPct||0),0) / prestaciones.length : 0;
+  panel.appendChild(el(`<h3 class="section-title">GO Intervención espacio público</h3><p class="section-desc">Cobertura y SLA por prestación, y operativos positivos/negativos por comuna y corredor.</p>`));
+  panel.appendChild(el(`<div class="kpi-grid">
+    <div class="kpi"><div class="label">Cobertura total</div><div class="value">${fmtPct(pct(verificados, ingresados))}</div><div class="note">${fmt(verificados)} verificados de ${fmt(ingresados)} ingresados</div></div>
+    <div class="kpi"><div class="label">SLA BA Colaborativa</div><div class="value">${fmtPct(slaColaborativa)}</div><div class="note">Promedio entre prestaciones</div></div>
+    <div class="kpi"><div class="label">SLA no OK</div><div class="value">${fmt(slaNoOk)}</div><div class="note">Casos acumulados en el mes</div></div>
+  </div>`));
+  const totalsWrap = el(`<div class="grid-cards" id="espacioTotals"></div>`);
+  panel.appendChild(totalsWrap);
+
+  panel.appendChild(el(`<h4 class="subsection-title">Cobertura de reclamo y SLA por prestación</h4>`));
+  renderPrestacionesTable(panel, d.prestaciones, disabled);
+  renderSlaComparison(panel, 'goEspacioPublico', d.prestaciones);
+
+  panel.appendChild(el(`<h4 class="subsection-title">Operativos positivos y negativos por comuna</h4>`));
+  panel.appendChild(el(`<div class="hint">Asigná cada comuna a "Corredor Norte" o "Resto de CABA" para ver los totales agrupados.</div>`));
+  const rows = d.operativosPorComuna;
+  const previousByComuna = new Map(((STATE.prevData && STATE.prevData.goEspacioPublico && STATE.prevData.goEspacioPublico.operativosPorComuna)||[]).map(r=>[r.comuna, Number(r.positivos||0)]));
+  const table = el(`<table><thead><tr><th>Comuna</th><th>Grupo</th><th>Positivos</th><th>Negativos</th><th>Variacion con mes anterior</th></tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  rows.forEach((r,i)=>{
+    const anterior = previousByComuna.get(r.comuna);
+    const tr = el(`<tr>
+      <td>${r.comuna}</td>
+      <td><select data-i="${i}" data-k="grupo" ${disabled?'disabled':''}>
+        <option value="Corredor Norte" ${r.grupo==='Corredor Norte'?'selected':''}>Corredor Norte</option>
+        <option value="Resto de CABA" ${r.grupo==='Resto de CABA'?'selected':''}>Resto de CABA</option>
+      </select></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="positivos" value="${r.positivos||0}" ${disabled?'disabled':''}/></td>
+      <td><input type="number" min="0" data-i="${i}" data-k="negativos" value="${r.negativos||0}" ${disabled?'disabled':''}/></td>
+      <td class="opvariation-${i}">${anterior===undefined?'—':deltaSpan(Number(r.positivos||0),anterior)}</td>
+    </tr>`);
+    tr.querySelectorAll('input,select').forEach(inp=>{
+      inp.oninput=()=>{
+        const ii=inp.dataset.i, kk=inp.dataset.k;
+        rows[ii][kk] = kk==='grupo' ? inp.value : (parseFloat(inp.value)||0);
+        if(kk==='positivos'){
+          const previo=previousByComuna.get(rows[ii].comuna);
+          table.querySelector('.opvariation-'+ii).innerHTML = previo===undefined?'—':deltaSpan(Number(rows[ii].positivos||0),previo);
+        }
+        recomputeEspacioTotals(); scheduleSave();
+      };
+    });
+    tbody.appendChild(tr);
+  });
+  panel.appendChild(table);
+
+  function computeGroupTotals(){
+    const groups = {'Corredor Norte':{pos:0,neg:0}, 'Resto de CABA':{pos:0,neg:0}};
+    let genPos=0, genNeg=0;
+    rows.forEach(r=>{
+      const g = groups[r.grupo] ? r.grupo : 'Resto de CABA';
+      groups[g].pos += Number(r.positivos||0); groups[g].neg += Number(r.negativos||0);
+      genPos += Number(r.positivos||0); genNeg += Number(r.negativos||0);
+    });
+    return {groups, genPos, genNeg};
+  }
+  function recomputeEspacioTotals(){
+    const {groups, genPos, genNeg} = computeGroupTotals();
+    let prevGen = null;
+    if(STATE.prevData && STATE.prevData.goEspacioPublico){
+      const pr = STATE.prevData.goEspacioPublico.operativosPorComuna||[];
+      let pp=0; pr.forEach(r=>pp+=Number(r.positivos||0));
+      prevGen = pp;
+    }
+    totalsWrap.innerHTML='';
+    totalsWrap.appendChild(el(`<div class="card"><h4>General <span class="pct-badge ${pctBadgeClass(pct(genPos,genPos+genNeg))}">${fmtPct(pct(genPos,genPos+genNeg))}</span></h4>
+      <div class="field-row"><label>Positivos</label><span>${fmt(genPos)}</span></div>
+      <div class="field-row"><label>Negativos</label><span>${fmt(genNeg)}</span></div>
+      <div class="top-note">${prevGen!==null? deltaSpan(genPos, prevGen):''}</div>
+    </div>`));
+    ['Corredor Norte','Resto de CABA'].forEach(g=>{
+      const gp = groups[g];
+      totalsWrap.appendChild(el(`<div class="card"><h4><span class="grp-tag">${g}</span> <span class="pct-badge ${pctBadgeClass(pct(gp.pos,gp.pos+gp.neg))}">${fmtPct(pct(gp.pos,gp.pos+gp.neg))}</span></h4>
+        <div class="field-row"><label>Positivos</label><span>${fmt(gp.pos)}</span></div>
+        <div class="field-row"><label>Negativos</label><span>${fmt(gp.neg)}</span></div>
+      </div>`));
+    });
+  }
+  recomputeEspacioTotals();
+}
+
+// ================= 5. GO LOGÍSTICA =================
+function renderGoLogistica(panel){
+  const d = STATE.data.goLogistica;
+  const disabled = !IS_EDITOR || STATE.data.closed;
+  const prev = STATE.prevData ? STATE.prevData.goLogistica : null;
+  panel.appendChild(el(`<h3 class="section-title">GO Logística</h3><p class="section-desc">Cobertura de planificación de cableado y desalojos del mes.</p>`));
+
+  panel.appendChild(el(`<h4 class="subsection-title">Desalojos del mes</h4>`));
+  const totalDesalojos = d.desalojos.length;
+  panel.appendChild(el(`<div class="card" style="max-width:220px;"><h4>Desalojos cargados</h4><div style="font-size:26px;font-weight:800;color:var(--navy);">${fmt(totalDesalojos)}</div><div class="top-note">Se calcula según los desalojos cargados abajo.</div></div>`));
+
+  const actions = el(`<div class="dyn-table-actions" style="margin-top:14px;"></div>`);
+  if(!disabled){
+    const btn = el(`<button class="add-row-btn">+ Agregar desalojo</button>`);
+    btn.onclick = ()=>{ d.desalojos.push(defaultDesalojo()); render(); };
+    actions.appendChild(btn);
+  }
+  panel.appendChild(actions);
+  if(d.desalojos.length===0){
+    panel.appendChild(el(`<div class="empty-note">Sin desalojos cargados este mes.</div>`));
+  }else{
+    const table = el(`<table><thead><tr><th>Fecha</th><th>Lugar</th><th>Recursos</th><th></th></tr></thead><tbody></tbody></table>`);
+    const tbody = table.querySelector('tbody');
+    d.desalojos.forEach((x,i)=>{
+      const tr = el(`<tr>
+        <td><input type="text" data-i="${i}" data-k="fecha" value="${x.fecha||''}" style="width:80px;" ${disabled?'disabled':''}/></td>
+        <td><input type="text" data-i="${i}" data-k="lugar" value="${x.lugar||''}" style="width:160px;text-align:left;" ${disabled?'disabled':''}/></td>
+        <td><input type="text" data-i="${i}" data-k="recursos" value="${x.recursos||''}" style="width:160px;text-align:left;" ${disabled?'disabled':''}/></td>
+        <td>${disabled?'':'<span class="del-btn">✕</span>'}</td>
+      </tr>`);
+      tr.querySelectorAll('input').forEach(inp=>{
+        inp.oninput=()=>{
+          const ii=inp.dataset.i, kk=inp.dataset.k;
+          d.desalojos[ii][kk] = inp.value;
+          scheduleSave(); render();
+        };
+      });
+      const delBtn = tr.querySelector('.del-btn');
+      if(delBtn) delBtn.onclick = ()=>{ d.desalojos.splice(i,1); scheduleSave(); render(); };
+      tbody.appendChild(tr);
+    });
+    panel.appendChild(table);
+  }
+
+  panel.appendChild(el(`<h4 class="subsection-title">Cobertura planificación cableado</h4>`));
+  const c = d.cableado;
+  const p = pct(c.verificado, c.planificado);
+  const prevP = prev ? pct(prev.cableado.verificado, prev.cableado.planificado) : null;
+  const card = el(`<div class="card" style="max-width:320px;margin-bottom:20px;">
+    <h4><span class="swatch"></span>Cobertura planificación cableado <span class="pct-badge ${pctBadgeClass(p)}" id="cabpct">${fmtPct(p)}</span></h4>
+    <div class="field-row"><label>Planificado</label><input type="number" min="0" id="cabPlan" value="${c.planificado||0}" ${disabled?'disabled':''}/></div>
+    <div class="field-row"><label>Verificado / resuelto</label><input type="number" min="0" id="cabVer" value="${c.verificado||0}" ${disabled?'disabled':''}/></div>
+    <div class="top-note">${deltaSpan(p, prevP)}</div>
+  </div>`);
+  function updCab(){
+    const np = pct(c.verificado, c.planificado);
+    const b = card.querySelector('#cabpct'); b.textContent=fmtPct(np); b.className='pct-badge '+pctBadgeClass(np);
+    scheduleSave();
+  }
+  card.querySelector('#cabPlan').oninput=(e)=>{ c.planificado=parseFloat(e.target.value)||0; updCab(); };
+  card.querySelector('#cabVer').oninput=(e)=>{ c.verificado=parseFloat(e.target.value)||0; updCab(); };
+  panel.appendChild(card);
+}
+
+// ================= HISTORIAL =================
+async function renderHistorial(panel){
+  await loadAllMonths();
+  panel.appendChild(el(`<h3 class="section-title">Historial de meses</h3><p class="section-desc">Todos los meses cargados hasta ahora.</p>`));
+  const sortedIds = [...STATE.index].sort();
+  const table = el(`<table><thead><tr><th>Mes</th><th>Estado</th><th>Operativos</th><th>Desalojos</th><th></th></tr></thead><tbody></tbody></table>`);
+  const tbody = table.querySelector('tbody');
+  sortedIds.forEach(id=>{
+    const md = STATE.allMonths[id]; if(!md) return;
+    const nOp = (md.grandesOperativos && md.grandesOperativos.operativos) ? md.grandesOperativos.operativos.length : 0;
+    const nDes = (md.goLogistica && md.goLogistica.desalojos) ? md.goLogistica.desalojos.length : 0;
+    const tr = el(`<tr>
+      <td>${md.label}</td>
+      <td>${md.closed? '🔒 Cerrado':'✏️ Abierto'}</td>
+      <td>${nOp}</td>
+      <td>${nDes}</td>
+      <td><span class="del-btn" style="background:var(--navy);" data-id="${id}">Ver</span></td>
+    </tr>`);
+    tr.querySelector('span').onclick = ()=> selectMonth(id);
+    tbody.appendChild(tr);
+  });
+  panel.appendChild(table);
+}
+
+boot();
+})();
+</script>
+
+
+
+
+
+
+</body>
+</html>
